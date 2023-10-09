@@ -1,4 +1,4 @@
-package com.aaron.encryption.services;
+package com.aaron.encryption.services.caesar;
 
 import org.springframework.stereotype.Service;
 

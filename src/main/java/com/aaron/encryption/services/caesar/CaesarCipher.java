@@ -1,4 +1,4 @@
-package com.aaron.encryption.services;
+package com.aaron.encryption.services.caesar;
 
 public interface CaesarCipher {
     String encrypt(String text, int shift);
