@@ -2,6 +2,7 @@ package com.aaron.encryption.resource;
 
 import com.aaron.encryption.services.caesar.CaesarCipher;
 import com.aaron.encryption.services.files.FileService;
+import com.aaron.encryption.utils.Algorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -59,8 +60,15 @@ public class EncryptionController {
 
 
     @PostMapping("/upload/encrypt")
-    public ResponseEntity<Map<String, Object>> uploadFiles(@RequestParam("files") List<MultipartFile> multipartFiles) throws IOException {
-        Map<String, Object> response = this.fileService.uploadFiles(multipartFiles);
+    public ResponseEntity<Map<String, Object>> uploadFilesAndEncrypt(@RequestParam("files") List<MultipartFile> multipartFiles) throws IOException {
+        Map<String, Object> response = this.fileService.uploadFilesAndEncrypt(multipartFiles, Algorithm.CAESER_CIPHER);
+        return ResponseEntity.ok().body(response);
+    }
+
+
+    @PostMapping("/upload/decrypt")
+    public ResponseEntity<Map<String, Object>> uploadFilesAndDecrypt(@RequestParam("files") List<MultipartFile> multipartFiles) throws IOException {
+        Map<String, Object> response = this.fileService.uploadFilesAndDecrypt(multipartFiles, Algorithm.CAESER_CIPHER);
         return ResponseEntity.ok().body(response);
     }
 
