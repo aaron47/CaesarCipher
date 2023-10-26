@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/polyalphabetic")
@@ -32,14 +33,14 @@ public class EncryptionPolyalphabeticController {
     }
 
     @PostMapping("/upload/encrypt")
-    public ResponseEntity<Map<String, Object>> uploadFilesAndEncrypt(@RequestParam("files") List<MultipartFile> multipartFiles) throws IOException {
-        Map<String, Object> response = this.fileService.uploadFilesAndEncrypt(multipartFiles, Algorithm.CAESER_CIPHER_POLYALPHABETIC);
+    public ResponseEntity<Map<String, Object>> uploadFilesAndEncrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("key") String key) throws IOException {
+        Map<String, Object> response = this.fileService.uploadFilesAndEncrypt(multipartFiles, Algorithm.CAESER_CIPHER_POLYALPHABETIC, Optional.empty(), Optional.of(key));
         return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/upload/decrypt")
-    public ResponseEntity<Map<String, Object>> uploadFilesAndDecrypt(@RequestParam("files") List<MultipartFile> multipartFiles) throws IOException {
-        Map<String, Object> response = this.fileService.uploadFilesAndDecrypt(multipartFiles, Algorithm.CAESER_CIPHER_POLYALPHABETIC);
+    public ResponseEntity<Map<String, Object>> uploadFilesAndDecrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("key") String key) throws IOException {
+        Map<String, Object> response = this.fileService.uploadFilesAndDecrypt(multipartFiles, Algorithm.CAESER_CIPHER_POLYALPHABETIC, Optional.empty(), Optional.of(key));
         return ResponseEntity.ok().body(response);
     }
 

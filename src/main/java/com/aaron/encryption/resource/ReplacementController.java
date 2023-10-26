@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/replacement")
@@ -32,13 +33,13 @@ public class ReplacementController {
 
     @PostMapping("/upload/encrypt")
     public ResponseEntity<Map<String, Object>> uploadFilesAndEncrypt(@RequestParam("files") List<MultipartFile> multipartFiles) throws IOException {
-        Map<String, Object> response = this.fileService.uploadFilesAndEncrypt(multipartFiles, Algorithm.REPLACEMENT);
+        Map<String, Object> response = this.fileService.uploadFilesAndEncrypt(multipartFiles, Algorithm.REPLACEMENT, Optional.empty(), Optional.empty());
         return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/upload/decrypt")
     public ResponseEntity<Map<String, Object>> uploadFilesAndDecrypt(@RequestParam("files") List<MultipartFile> multipartFiles) throws IOException {
-        Map<String, Object> response = this.fileService.uploadFilesAndDecrypt(multipartFiles, Algorithm.REPLACEMENT);
+        Map<String, Object> response = this.fileService.uploadFilesAndDecrypt(multipartFiles, Algorithm.REPLACEMENT, Optional.empty(), Optional.empty());
         return ResponseEntity.ok().body(response);
     }
 

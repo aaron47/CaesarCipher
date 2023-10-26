@@ -12,10 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Paths.get;
@@ -30,10 +27,10 @@ public class FileServiceImpl implements FileService {
 
     private static final int SHIFT = 3;
     private static final String DIRECTORY = System.getProperty("user.home") + "/Downloads/";
-    private static final String key = "FGfXJUGk}M>c&r~";
+    private static final String KEY = "FGfXJUGk}M>c&r~";
 
     @Override
-    public Map<String, Object> uploadFilesAndEncrypt(List<MultipartFile> multipartFiles, Algorithm algorithm) throws IOException {
+    public Map<String, Object> uploadFilesAndEncrypt(List<MultipartFile> multipartFiles, Algorithm algorithm, Optional<Integer> shift, Optional<String> key) throws IOException {
         List<String> fileNames = new ArrayList<>();
         Map<String, Object> response = new HashMap<>();
         String encryptedText = "";
@@ -48,8 +45,9 @@ public class FileServiceImpl implements FileService {
                 String content = new String(file.getBytes(), StandardCharsets.UTF_8);
 
                 switch (algorithm) {
-                    case CAESER_CIPHER -> encryptedText = this.caesarCipher.encrypt(content, SHIFT);
-                    case CAESER_CIPHER_POLYALPHABETIC -> encryptedText =  this.caesarCipherPolyalphabeticService.encrypt(content, key);
+                    case CAESER_CIPHER -> encryptedText = this.caesarCipher.encrypt(content, shift.orElse(SHIFT));
+                    case CAESER_CIPHER_POLYALPHABETIC ->
+                            encryptedText = this.caesarCipherPolyalphabeticService.encrypt(content, key.orElse(KEY));
                     case REPLACEMENT -> encryptedText = this.replacementService.encrypt(content);
                 }
 
@@ -65,7 +63,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Map<String, Object> uploadFilesAndDecrypt(List<MultipartFile> multipartFiles, Algorithm algorithm) throws IOException {
+    public Map<String, Object> uploadFilesAndDecrypt(List<MultipartFile> multipartFiles, Algorithm algorithm, Optional<Integer> shift, Optional<String> key) throws IOException {
         List<String> fileNames = new ArrayList<>();
         Map<String, Object> response = new HashMap<>();
         String decryptedText = "";
@@ -80,8 +78,9 @@ public class FileServiceImpl implements FileService {
                 String content = new String(file.getBytes(), StandardCharsets.UTF_8);
 
                 switch (algorithm) {
-                    case CAESER_CIPHER -> decryptedText = this.caesarCipher.decrypt(content, SHIFT);
-                    case CAESER_CIPHER_POLYALPHABETIC -> decryptedText =  this.caesarCipherPolyalphabeticService.decrypt(content, key);
+                    case CAESER_CIPHER -> decryptedText = this.caesarCipher.decrypt(content, shift.orElse(SHIFT));
+                    case CAESER_CIPHER_POLYALPHABETIC ->
+                            decryptedText = this.caesarCipherPolyalphabeticService.decrypt(content, key.orElse(KEY));
                     case REPLACEMENT -> decryptedText = this.replacementService.decrypt(content);
                 }
 
