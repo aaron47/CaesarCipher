@@ -4,49 +4,71 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CaesarCipherPolyalphabeticServiceImpl implements CaesarCipherPolyalphabeticService {
-    @Override
-    public String encrypt(String text, String key) {
-        StringBuilder result = new StringBuilder();
 
-        for (int i = 0; i < text.length(); i++) {
-            char ch = text.charAt(i);
-            if (Character.isLetter(ch)) {
-                int shift = Character.isUpperCase(key.charAt(i % key.length()))
-                        ? key.charAt(i % key.length()) - 'A'
-                        : key.charAt(i % key.length()) - 'a';
-                result.append(shiftChar(ch, shift));
-            } else {
-                result.append(ch);
+    private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final int ALPHABET_SIZE = ALPHABET.length();
+
+
+    private char[][] generateTable() {
+        char[][] table = new char[ALPHABET_SIZE][ALPHABET_SIZE];
+
+        for (int i = 0; i < ALPHABET_SIZE; i++) {
+            for (int j = 0; j < ALPHABET_SIZE; j++) {
+                table[i][j] = ALPHABET.charAt((i + j) % ALPHABET_SIZE);
             }
         }
-        return result.toString();
+
+        return table;
+    }
+
+    @Override
+    public String encrypt(String plainText, String key) {
+        char[][] table = generateTable();
+        StringBuilder encryptedText = new StringBuilder();
+
+        for (int i = 0, keyIndex = 0; i < plainText.length(); i++) {
+            char p = plainText.charAt(i);
+            char k = key.charAt(keyIndex);
+
+            if (ALPHABET.indexOf(p) >= 0) {
+                int row = ALPHABET.indexOf(k);
+                int col = ALPHABET.indexOf(p);
+                encryptedText.append(table[row][col]);
+
+                keyIndex = (keyIndex + 1) % key.length();
+            } else {
+                encryptedText.append(p);
+            }
+        }
+
+        return encryptedText.toString();
     }
 
     @Override
     public String decrypt(String encryptedText, String key) {
-        StringBuilder result = new StringBuilder();
+        char[][] table = generateTable();
+        StringBuilder decryptedText = new StringBuilder();
 
-        for (int i = 0; i < encryptedText.length(); i++) {
-            char ch = encryptedText.charAt(i);
-            if (Character.isLetter(ch)) {
-                int shift = Character.isUpperCase(key.charAt(i % key.length()))
-                        ? key.charAt(i % key.length()) - 'A'
-                        : key.charAt(i % key.length()) - 'a';
-                result.append(shiftChar(ch, -shift));
+        for (int i = 0, keyIndex = 0; i < encryptedText.length(); i++) {
+            char c = encryptedText.charAt(i);
+            char k = key.charAt(keyIndex);
+
+            if (ALPHABET.indexOf(c) >= 0) {
+                int row = ALPHABET.indexOf(k);
+
+                for (int col = 0; col < ALPHABET_SIZE; col++) {
+                    if (table[row][col] == c) {
+                        decryptedText.append(ALPHABET.charAt(col));
+                        break;
+                    }
+                }
+
+                keyIndex = (keyIndex + 1) % key.length();
             } else {
-                result.append(ch);
+                decryptedText.append(c);
             }
         }
-        return result.toString();
-    }
 
-    private char shiftChar(char c, int shift) {
-        if (Character.isUpperCase(c)) {
-            return (char) ((c + shift - 'A' + 26) % 26 + 'A');
-        } else if (Character.isLowerCase(c)) {
-            return (char) ((c + shift - 'a' + 26) % 26 + 'a');
-        } else {
-            return c;
-        }
+        return decryptedText.toString();
     }
 }

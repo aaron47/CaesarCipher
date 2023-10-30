@@ -2,6 +2,7 @@ package com.aaron.encryption.services.files;
 
 import com.aaron.encryption.services.caesar.CaesarCipher;
 import com.aaron.encryption.services.caesar_polyalphabetic.CaesarCipherPolyalphabeticService;
+import com.aaron.encryption.services.column_transposition.ColumnTranspositionService;
 import com.aaron.encryption.services.replacement.ReplacementService;
 import com.aaron.encryption.utils.Algorithm;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class FileServiceImpl implements FileService {
     private final CaesarCipher caesarCipher;
     private final CaesarCipherPolyalphabeticService caesarCipherPolyalphabeticService;
     private final ReplacementService replacementService;
+    private final ColumnTranspositionService columnTranspositionService;
 
     private static final int SHIFT = 3;
     private static final String DIRECTORY = System.getProperty("user.home") + "/Downloads/";
@@ -49,6 +51,7 @@ public class FileServiceImpl implements FileService {
                     case CAESER_CIPHER_POLYALPHABETIC ->
                             encryptedText = this.caesarCipherPolyalphabeticService.encrypt(content, key.orElse(KEY));
                     case REPLACEMENT -> encryptedText = this.replacementService.encrypt(content);
+                    case COLUMN_TRANSPOSITION -> encryptedText = this.columnTranspositionService.encrypt(content, key.orElse(KEY));
                 }
 
 
@@ -82,6 +85,7 @@ public class FileServiceImpl implements FileService {
                     case CAESER_CIPHER_POLYALPHABETIC ->
                             decryptedText = this.caesarCipherPolyalphabeticService.decrypt(content, key.orElse(KEY));
                     case REPLACEMENT -> decryptedText = this.replacementService.decrypt(content);
+                    case COLUMN_TRANSPOSITION -> decryptedText = this.columnTranspositionService.decrypt(content, key.orElse(KEY));
                 }
 
                 response.put("decrypted_text", decryptedText);
