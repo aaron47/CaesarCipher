@@ -3,6 +3,7 @@ package com.aaron.encryption.resource;
 import com.aaron.encryption.services.caesar_polyalphabetic.CaesarCipherPolyalphabeticService;
 import com.aaron.encryption.services.files.FileService;
 import com.aaron.encryption.utils.Algorithm;
+import com.aaron.encryption.utils.AlgorithmWithKeyRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +24,8 @@ public class EncryptionPolyalphabeticController {
     private final FileService fileService;
 
     @PostMapping("/encrypt")
-    public ResponseEntity<Map<String, String>> encrypt(@RequestBody String text) {
-        String encryptedText = this.caesarCipherPolyalphabeticService.encrypt(text, key);
+    public ResponseEntity<Map<String, String>> encrypt(@RequestBody AlgorithmWithKeyRequest algorithmWithKeyRequest) {
+        String encryptedText = this.caesarCipherPolyalphabeticService.encrypt(algorithmWithKeyRequest.getText(), algorithmWithKeyRequest.getKey());
 
         Map<String, String> response = new HashMap<>();
         response.put("text", encryptedText);
@@ -45,8 +46,8 @@ public class EncryptionPolyalphabeticController {
     }
 
     @PostMapping("/decrypt")
-    public ResponseEntity<Map<String, String>> decrypt(@RequestBody String text) {
-        String decryptedText = this.caesarCipherPolyalphabeticService.decrypt(text, key);
+    public ResponseEntity<Map<String, String>> decrypt(@RequestBody AlgorithmWithKeyRequest algorithmWithKeyRequest) {
+        String decryptedText = this.caesarCipherPolyalphabeticService.decrypt(algorithmWithKeyRequest.getText(), algorithmWithKeyRequest.getKey());
 
         Map<String, String> response = new HashMap<>();
         response.put("text", decryptedText);

@@ -23,22 +23,20 @@ public class CaesarCipherPolyalphabeticServiceImpl implements CaesarCipherPolyal
 
     @Override
     public String encrypt(String plainText, String key) {
+        String trimmedText = plainText.replaceAll("\\s+", "");
+
         char[][] table = generateTable();
         StringBuilder encryptedText = new StringBuilder();
 
-        for (int i = 0, keyIndex = 0; i < plainText.length(); i++) {
-            char p = plainText.charAt(i);
-            char k = key.charAt(keyIndex);
+        for (int i = 0, keyIndex = 0; i < trimmedText.length(); i++) {
+            char p = trimmedText.charAt(i);
+            char k = key.charAt(keyIndex % key.length());
 
-            if (ALPHABET.indexOf(p) >= 0) {
-                int row = ALPHABET.indexOf(k);
-                int col = ALPHABET.indexOf(p);
-                encryptedText.append(table[row][col]);
+            int row = ALPHABET.indexOf(k);
+            int col = ALPHABET.indexOf(p);
+            encryptedText.append(table[row][col]);
 
-                keyIndex = (keyIndex + 1) % key.length();
-            } else {
-                encryptedText.append(p);
-            }
+            keyIndex++;
         }
 
         return encryptedText.toString();
@@ -70,5 +68,14 @@ public class CaesarCipherPolyalphabeticServiceImpl implements CaesarCipherPolyal
         }
 
         return decryptedText.toString();
+    }
+
+    private boolean isValid(String input) {
+        for (char c : input.toCharArray()) {
+            if (ALPHABET.indexOf(c) == -1) {
+                return false;
+            }
+        }
+        return true;
     }
 }
