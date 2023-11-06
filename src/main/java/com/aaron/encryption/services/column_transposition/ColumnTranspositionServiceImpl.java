@@ -2,18 +2,22 @@ package com.aaron.encryption.services.column_transposition;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+
 import static java.util.Arrays.*;
 
 @Service
 public class ColumnTranspositionServiceImpl implements ColumnTranspositionService {
     @Override
-    public String encrypt(String plainText, String key) {
+    public String encrypt(String text, String key) {
         int[] order = getOrder(key);
         StringBuilder encryptedText = new StringBuilder();
 
-        for (int col = 0; col < order.length; col++) {
-            for (int row = order[col]; row < plainText.length(); row += key.length()) {
-                encryptedText.append(plainText.charAt(row));
+        for (int i = 0; i < order.length; i++) {
+            int j = order[i];
+            while (j < text.length()) {
+                encryptedText.append(text.charAt(j));
+                j += key.length();
             }
         }
 
@@ -23,40 +27,42 @@ public class ColumnTranspositionServiceImpl implements ColumnTranspositionServic
     @Override
     public String decrypt(String encryptedText, String key) {
         int[] order = getOrder(key);
-        int numRows = (int) Math.ceil((double) encryptedText.length() / key.length());
-        char[][] table = new char[numRows][key.length()];
-        int index = 0;
+        int columns = key.length();
+        int rows = (int) Math.ceil((double) encryptedText.length() / columns);
+        char[][] grid = new char[rows][columns];
 
-        for (int col = 0; col < order.length; col++) {
-            for (int row = 0; row < numRows && index < encryptedText.length(); row++) {
-                table[row][order[col]] = encryptedText.charAt(index++);
+        int k = 0;
+        for (int col : order) {
+            for (int row = 0; row < rows; row++) {
+                if (k < encryptedText.length()) {
+                    grid[row][col] = encryptedText.charAt(k++);
+                } else {
+                    grid[row][col] = ' ';
+                }
             }
         }
 
-        StringBuilder plaintext = new StringBuilder();
-        for (int row = 0; row < numRows; row++) {
-            for (int col = 0; col < key.length() && table[row][col] != 0; col++) {
-                plaintext.append(table[row][col]);
+        StringBuilder decryptedText = new StringBuilder();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                if (grid[i][j] != ' ') {
+                    decryptedText.append(grid[i][j]);
+                }
             }
         }
 
-        return plaintext.toString();
+        return decryptedText.toString();
     }
 
-    // This method provides an order for the columns based on the key
     private int[] getOrder(String key) {
         int[] order = new int[key.length()];
         char[] keyArray = key.toCharArray();
-        sort(keyArray);
+        char[] sortedKeyArray = key.toCharArray();
+        Arrays.sort(sortedKeyArray);
 
         for (int i = 0; i < key.length(); i++) {
-            for (int j = 0; j < key.length(); j++) {
-                if (key.charAt(i) == keyArray[j]) {
-                    order[i] = j;
-                    keyArray[j] = '\0'; // Mark as visited
-                    break;
-                }
-            }
+            order[i] = new String(keyArray).indexOf(sortedKeyArray[i]);
+            keyArray[order[i]] = ' ';
         }
 
         return order;

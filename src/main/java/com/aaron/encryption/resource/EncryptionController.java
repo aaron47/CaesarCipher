@@ -3,6 +3,7 @@ package com.aaron.encryption.resource;
 import com.aaron.encryption.services.caesar.CaesarCipher;
 import com.aaron.encryption.services.files.FileService;
 import com.aaron.encryption.utils.Algorithm;
+import com.aaron.encryption.utils.CaesarRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -36,8 +37,8 @@ public class EncryptionController {
     private static final String DIRECTORY = System.getProperty("user.home") + "/Downloads/";
 
     @PostMapping("/encrypt")
-    public ResponseEntity<Map<String, String>> encrypt(@RequestBody String text) {
-        String encryptedText = this.caesarCipher.encrypt(text, SHIFT);
+    public ResponseEntity<Map<String, String>> encrypt(@RequestBody CaesarRequest caesarRequest) {
+        String encryptedText = this.caesarCipher.encrypt(caesarRequest.getText(), caesarRequest.getShift());
 
         Map<String, String> response = new HashMap<>();
         response.put("text", encryptedText);
@@ -46,8 +47,8 @@ public class EncryptionController {
     }
 
     @PostMapping("/decrypt")
-    public ResponseEntity<Map<String, String>> decrypt(@RequestBody String text) {
-        String decryptedText = this.caesarCipher.decrypt(text, SHIFT);
+    public ResponseEntity<Map<String, String>> decrypt(@RequestBody CaesarRequest caesarRequest) {
+        String decryptedText = this.caesarCipher.decrypt(caesarRequest.getText(), caesarRequest.getShift());
 
         Map<String, String> response = new HashMap<>();
         response.put("text", decryptedText);
