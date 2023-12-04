@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +25,7 @@ public class ColumnTranspositionController {
     private final FileService fileService;
 
     @PostMapping("/upload/encrypt")
-    public ResponseEntity<Map<String, Object>> uploadFilesAndEncrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("key") String key) throws IOException {
+    public ResponseEntity<Map<String, Object>> uploadFilesAndEncrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("key") String key) throws Exception {
         Map<String, Object> response = this.fileService.uploadFilesAndEncrypt(multipartFiles, Algorithm.COLUMN_TRANSPOSITION, Optional.empty(), Optional.of(key));
         return ResponseEntity.ok().body(response);
     }

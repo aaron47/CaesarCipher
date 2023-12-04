@@ -1,15 +1,20 @@
 package com.aaron.encryption.services.files;
 
+import com.aaron.encryption.services.aes.AesService;
 import com.aaron.encryption.services.caesar.CaesarCipher;
 import com.aaron.encryption.services.caesar_polyalphabetic.CaesarCipherPolyalphabeticService;
 import com.aaron.encryption.services.column_transposition.ColumnTranspositionService;
+import com.aaron.encryption.services.des.DesService;
 import com.aaron.encryption.services.replacement.ReplacementService;
+import com.aaron.encryption.services.rsa.RsaService;
 import com.aaron.encryption.utils.Algorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -26,13 +31,17 @@ public class FileServiceImpl implements FileService {
     private final CaesarCipherPolyalphabeticService caesarCipherPolyalphabeticService;
     private final ReplacementService replacementService;
     private final ColumnTranspositionService columnTranspositionService;
+    private final DesService desService;
+    private final AesService aesService;
+    private final RsaService rsaService;
+
 
     private static final int SHIFT = 3;
     private static final String DIRECTORY = System.getProperty("user.home") + "/Downloads/";
     private static final String KEY = "FGfXJUGk}M>c&r~";
 
     @Override
-    public Map<String, Object> uploadFilesAndEncrypt(List<MultipartFile> multipartFiles, Algorithm algorithm, Optional<Integer> shift, Optional<String> key) throws IOException {
+    public Map<String, Object> uploadFilesAndEncrypt(List<MultipartFile> multipartFiles, Algorithm algorithm, Optional<Integer> shift, Optional<String> key) throws Exception {
         List<String> fileNames = new ArrayList<>();
         Map<String, Object> response = new HashMap<>();
         String encryptedText = "";
@@ -51,7 +60,11 @@ public class FileServiceImpl implements FileService {
                     case CAESER_CIPHER_POLYALPHABETIC ->
                             encryptedText = this.caesarCipherPolyalphabeticService.encrypt(content, key.orElse(KEY));
                     case REPLACEMENT -> encryptedText = this.replacementService.encrypt(content);
-                    case COLUMN_TRANSPOSITION -> encryptedText = this.columnTranspositionService.encrypt(content, key.orElse(KEY));
+                    case COLUMN_TRANSPOSITION ->
+                            encryptedText = this.columnTranspositionService.encrypt(content, key.orElse(KEY));
+                    case DES -> encryptedText = this.desService.encrypt(content);
+                    case AES -> encryptedText = this.aesService.encrypt(content);
+                    case RSA -> encryptedText = this.rsaService.encrypt(content);
                 }
 
 
@@ -66,7 +79,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Map<String, Object> uploadFilesAndDecrypt(List<MultipartFile> multipartFiles, Algorithm algorithm, Optional<Integer> shift, Optional<String> key) throws IOException {
+    public Map<String, Object> uploadFilesAndDecrypt(List<MultipartFile> multipartFiles, Algorithm algorithm, Optional<Integer> shift, Optional<String> key) throws Exception {
         List<String> fileNames = new ArrayList<>();
         Map<String, Object> response = new HashMap<>();
         String decryptedText = "";
@@ -85,7 +98,11 @@ public class FileServiceImpl implements FileService {
                     case CAESER_CIPHER_POLYALPHABETIC ->
                             decryptedText = this.caesarCipherPolyalphabeticService.decrypt(content, key.orElse(KEY));
                     case REPLACEMENT -> decryptedText = this.replacementService.decrypt(content);
-                    case COLUMN_TRANSPOSITION -> decryptedText = this.columnTranspositionService.decrypt(content, key.orElse(KEY));
+                    case COLUMN_TRANSPOSITION ->
+                            decryptedText = this.columnTranspositionService.decrypt(content, key.orElse(KEY));
+                    case DES -> decryptedText = this.desService.decrypt(content);
+                    case AES -> decryptedText = this.aesService.decrypt(content);
+                    case RSA -> decryptedText = this.rsaService.decrypt(content);
                 }
 
                 response.put("decrypted_text", decryptedText);

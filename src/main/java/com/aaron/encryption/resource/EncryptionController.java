@@ -14,6 +14,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -58,14 +60,14 @@ public class EncryptionController {
 
 
     @PostMapping("/upload/encrypt")
-    public ResponseEntity<Map<String, Object>> uploadFilesAndEncrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("shift") Integer shift) throws IOException {
+    public ResponseEntity<Map<String, Object>> uploadFilesAndEncrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("shift") Integer shift) throws Exception {
         Map<String, Object> response = this.fileService.uploadFilesAndEncrypt(multipartFiles, Algorithm.CAESER_CIPHER, Optional.of(shift), Optional.<String>empty());
         return ResponseEntity.ok().body(response);
     }
 
 
     @PostMapping("/upload/decrypt")
-    public ResponseEntity<Map<String, Object>> uploadFilesAndDecrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("shift") Integer shift) throws IOException {
+    public ResponseEntity<Map<String, Object>> uploadFilesAndDecrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("shift") Integer shift) throws Exception {
         Map<String, Object> response = this.fileService.uploadFilesAndDecrypt(multipartFiles, Algorithm.CAESER_CIPHER, Optional.of(shift), Optional.empty());
         return ResponseEntity.ok().body(response);
     }

@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -34,13 +36,13 @@ public class EncryptionPolyalphabeticController {
     }
 
     @PostMapping("/upload/encrypt")
-    public ResponseEntity<Map<String, Object>> uploadFilesAndEncrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("key") String key) throws IOException {
+    public ResponseEntity<Map<String, Object>> uploadFilesAndEncrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("key") String key) throws Exception {
         Map<String, Object> response = this.fileService.uploadFilesAndEncrypt(multipartFiles, Algorithm.CAESER_CIPHER_POLYALPHABETIC, Optional.empty(), Optional.of(key));
         return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/upload/decrypt")
-    public ResponseEntity<Map<String, Object>> uploadFilesAndDecrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("key") String key) throws IOException {
+    public ResponseEntity<Map<String, Object>> uploadFilesAndDecrypt(@RequestParam("files") List<MultipartFile> multipartFiles, @RequestParam("key") String key) throws Exception {
         Map<String, Object> response = this.fileService.uploadFilesAndDecrypt(multipartFiles, Algorithm.CAESER_CIPHER_POLYALPHABETIC, Optional.empty(), Optional.of(key));
         return ResponseEntity.ok().body(response);
     }
